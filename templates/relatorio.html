@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Chamados</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Relatório de Chamados</h1>
+
+        <!-- Botão para voltar à página inicial -->
+        <div class="text-center mb-4">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Voltar</a>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title">Filtros</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('relatorio') }}">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="prioridade" class="form-label">Prioridade</label>
+                            <select class="form-select" id="prioridade" name="prioridade">
+                                <option value="">Todas</option>
+                                <option value="urgente">Urgente</option>
+                                <option value="alta">Alta</option>
+                                <option value="media">Média</option>
+                                <option value="baixa">Baixa</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tipo" class="form-label">Tipo</label>
+                            <select class="form-select" id="tipo" name="tipo">
+                                <option value="">Todos</option>
+                                <option value="incidente">Incidente</option>
+                                <option value="solicitacao">Solicitação</option>
+                                <option value="fora_do_escopo">Fora do Escopo</option>
+                                <option value="projeto">Projeto</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="categoria" class="form-label">Categoria</label>
+                            <select class="form-select" id="categoria" name="categoria">
+                                <option value="">Todas</option>
+                                <option value="hardware">Hardware</option>
+                                <option value="software">Software</option>
+                                <option value="rede">Rede</option>
+                                <option value="telefonia">Telefonia</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">Todos</option>
+                                <option value="aberto">Aberto</option>
+                                <option value="fechado presencial">Fechado Presencial</option>
+                                <option value="fechado remoto">Fechado Remoto</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="data_inicio" class="form-label">Data Início</label>
+                            <input type="date" class="form-control" id="data_inicio" name="data_inicio">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="data_fim" class="form-label">Data Fim</label>
+                            <input type="date" class="form-control" id="data_fim" name="data_fim">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
+                        <a href="{{ url_for('relatorio') }}" class="btn btn-secondary">Limpar Filtros</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resumo -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title">Resumo</h5>
+            </div>
+            <div class="card-body">
+                <p>Total de Chamados: {{ total_chamados }}</p>
+                <p>Chamados Abertos: {{ chamados_abertos }}</p>
+                <p>Chamados Fechados: {{ chamados_fechados }}</p>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title">Gráficos</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoPrioridades"></canvas>
+            </div>
+        </div>
+
+        <!-- Tabela de chamados -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Lista de Chamados</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Solicitante</th>
+                                <th>Descrição</th>
+                                <th>Prioridade</th>
+                                <th>Tipo</th>
+                                <th>Categoria</th>
+                                <th>Status</th>
+                                <th>Solução</th>
+                                <th>Data Abertura</th>
+                                <th>Data Fechamento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if chamados %}
+                                {% for chamado in chamados %}
+                                <tr>
+                                    <td>{{ chamado['numero_chamado'] }}</td>
+                                    <td>{{ chamado['solicitante'] }}</td>
+                                    <td>{{ chamado['descricao'] }}</td>
+                                    <td>{{ chamado['prioridade'] }}</td>
+                                    <td>{{ chamado['tipo'] }}</td>
+                                    <td>{{ chamado['categoria'] }}</td>
+                                    <td>{{ chamado['status'] }}</td>
+                                    <td>{{ chamado['solucao'] if chamado['solucao'] else 'Não fechado' }}</td>
+                                    <td>{{ formatar_data_hora(chamado['data_abertura']) }}</td>
+                                    <td>{{ formatar_data_hora(chamado['data_fechamento']) if chamado['data_fechamento'] else 'Não fechado' }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="10" class="text-center">Nenhum chamado encontrado.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão para exportar CSV -->
+        <div class="text-center mt-4">
+            <a href="{{ url_for('exportar_csv') }}" class="btn btn-success">Exportar para CSV</a>
+        </div>
+    </div>
+
+    <!-- Script do gráfico -->
+    <script>
+        const ctx = document.getElementById('graficoPrioridades').getContext('2d');
+        const grafico = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Urgente', 'Alta', 'Média', 'Baixa'],
+                datasets: [{
+                    label: 'Chamados por Prioridade',
+                    data: [
+                        {{ chamados|selectattr('prioridade', 'equalto', 'urgente')|list|length }},
+                        {{ chamados|selectattr('prioridade', 'equalto', 'alta')|list|length }},
+                        {{ chamados|selectattr('prioridade', 'equalto', 'media')|list|length }},
+                        {{ chamados|selectattr('prioridade', 'equalto', 'baixa')|list|length }}
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
