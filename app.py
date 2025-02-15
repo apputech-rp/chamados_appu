@@ -188,5 +188,10 @@ def excluir(id):
     db.close()
     return redirect(url_for('index'))
 
+import os
+from app import app  # Ou o nome do seu aplicativo Flask
+
 if __name__ == '__main__':
-   app.run(host='192.168.100.40', port=5000, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    host = os.environ.get("HOST", "0.0.0.0")
+    app.run(host=host, port=port, debug=False)
