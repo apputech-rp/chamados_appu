@@ -93,6 +93,8 @@
             <div class="card-body">
                 <p>Total de Chamados: {{ total_chamados }}</p>
                 <p>Chamados Abertos: {{ chamados_abertos }}</p>
+		<p>Chamados em Andamento: {{ chamados_em_andamento }}</p>
+		<p>Chamados em Orçamento: {{ chamados_orcamento }}</p>
                 <p>Chamados Fechados: {{ chamados_fechados }}</p>
             </div>
         </div>
@@ -164,43 +166,44 @@
 
     <!-- Script do gráfico -->
     <script>
-        const ctx = document.getElementById('graficoPrioridades').getContext('2d');
-        const grafico = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Urgente', 'Alta', 'Média', 'Baixa'],
-                datasets: [{
-                    label: 'Chamados por Prioridade',
-                    data: [
-                        {{ chamados|selectattr('prioridade', 'equalto', 'urgente')|list|length }},
-                        {{ chamados|selectattr('prioridade', 'equalto', 'alta')|list|length }},
-                        {{ chamados|selectattr('prioridade', 'equalto', 'media')|list|length }},
-                        {{ chamados|selectattr('prioridade', 'equalto', 'baixa')|list|length }}
-                    ],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+    const ctx = document.getElementById('graficoPrioridades').getContext('2d');
+    const grafico = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Urgente', 'Alta', 'Média', 'Baixa'],
+            datasets: [{
+                label: 'Chamados por Prioridade',
+                data: [
+                    {{ contagem_prioridades['urgente'] }},
+                    {{ contagem_prioridades['alta'] }},
+                    {{ contagem_prioridades['media'] }},
+                    {{ contagem_prioridades['baixa'] }}
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
-    </script>
+        }
+    });
+</script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
