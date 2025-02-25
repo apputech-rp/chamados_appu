@@ -1,4 +1,8 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, render_template, request, redirect, url_for, flash, Response, jsonify
+from flask_httpauth import HTTPBasicAuth
 
 import os
 import psycopg2
@@ -14,6 +18,31 @@ fuso_brasilia = pytz.timezone('America/Sao_Paulo')
 
 # URL do banco de dados (definir no Render)
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://appu_db_qflz_user:KP9LDX3ptUDn79KyzOsP3UTDgF8IvFCG@dpg-cuqtillumphs73f0cov0-a.oregon-postgres.render.com/appu_db_qflz")
+
+auth = HTTPBasicAuth()
+
+BASIC_AUTH_USERNAME1 = os.environ.get('BASIC_AUTH_USERNAME1', 'denis')  # Valor padrão se não definido
+BASIC_AUTH_PASSWORD1 = os.environ.get('BASIC_AUTH_PASSWORD1')
+BASIC_AUTH_USERNAME2 = os.environ.get('BASIC_AUTH_USERNAME2', 'lubelia')
+BASIC_AUTH_PASSWORD2 = os.environ.get('BASIC_AUTH_PASSWORD2')
+
+print(f"Usuário 1: {BASIC_AUTH_USERNAME1}, Senha 1: {BASIC_AUTH_PASSWORD1}")
+print(f"Usuário 2: {BASIC_AUTH_USERNAME2}, Senha 2: {BASIC_AUTH_PASSWORD2}")
+
+@auth.verify_password
+def verify_password(username, password):
+    username = username.strip().lower()
+    password = password.strip().lower()
+    basic_username1 = BASIC_AUTH_USERNAME1.strip().lower()
+    basic_password1 = BASIC_AUTH_PASSWORD1.strip().lower()
+    basic_username2 = BASIC_AUTH_USERNAME2.strip().lower()
+    basic_password2 = BASIC_AUTH_PASSWORD2.strip().lower()
+
+    if username == basic_username1 and password == basic_password1:
+        return username
+    elif username == basic_username2 and password == basic_password2:
+        return username
+    return None
 
 def get_db():
     try:
@@ -44,6 +73,7 @@ def inject_functions():
     return {'formatar_data_hora': formatar_data_hora}
 
 @app.route('/', methods=['GET', 'POST'])
+@auth.login_required
 def index():
     db = get_db()
     if not db:
