@@ -26,9 +26,6 @@ BASIC_AUTH_PASSWORD1 = os.environ.get('BASIC_AUTH_PASSWORD1')
 BASIC_AUTH_USERNAME2 = os.environ.get('BASIC_AUTH_USERNAME2', 'lubelia')
 BASIC_AUTH_PASSWORD2 = os.environ.get('BASIC_AUTH_PASSWORD2')
 
-print(f"Usuário 1: {BASIC_AUTH_USERNAME1}, Senha 1: {BASIC_AUTH_PASSWORD1}")
-print(f"Usuário 2: {BASIC_AUTH_USERNAME2}, Senha 2: {BASIC_AUTH_PASSWORD2}")
-
 @auth.verify_password
 def verify_password(username, password):
     username = username.strip().lower()
